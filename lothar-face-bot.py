@@ -5,6 +5,7 @@ import face_recognition
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import cv2
 from dotenv import load_dotenv
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
@@ -104,6 +105,35 @@ def get_pic_of(update: Update, context: CallbackContext) -> None:
     else:
         logger.info(f"not allowed in this chat ({update.message.chat.id}), sorry")
     #logger.debug(f"Chat {update.effective_chat.id} - Comando: {command}")
+
+
+def get_mosaic_of(update: Update, context: CallbackContext) -> None:
+    """Return the encoding of someone as small image - needs to be a lothar"""
+    if check_correct_chat(update.message.chat.id):
+        full_command = ' '.join(context.args)
+        lothar_mentioned = get_lothar_mentioned(full_command)
+        if len(lothar_mentioned) == 0:
+            update.message.reply_text('Non ho trovato nessun lothar - di chi volevi la foto?')
+        else:
+            for lothar in lothar_mentioned:
+                logger.info(f'Chat {update.effective_chat.id} - Photo of {lothar}')
+                photo_folder = f"lothar-faces/{lothar}"
+                big_img = np.zeros((1440, 2160))
+                for i in range(3):
+                    for j in range(3):
+                        images_path = os.listdir(photo_folder)
+                        random_index = np.round(random.random() * len(images_path)).astype(int)
+                        chosen_image = images_path[random_index]
+                        #date_photo = chosen_image[10:12] + "-" + chosen_image[8:10] + "-" + chosen_image[4:8]
+                        filename = os.path.join(photo_folder, chosen_image)
+                        small_img = plt.imread(filename)
+                        small_img_resized = cv2.resize(small_img, (480,720))
+                        big_img[(480*i):(480*(i+1)), (720*j):(720*(j+1))] = small_img_resized
+                plt.imsave("tmp_mosaic.jpg", big_img)
+                update.message.reply_photo(open("tmp_mosaic.jpg", 'rb'))
+                update.message.reply_text(f'mosaico di {lothar_mentioned[0]}')
+    else:
+        logger.info(f"not allowed in this chat ({update.message.chat.id}), sorry")
 
 
 def get_embeddings_of(update: Update, context: CallbackContext) -> None:
