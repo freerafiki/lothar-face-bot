@@ -11,7 +11,7 @@ After=systemd-networkd-wait-online.service
 # Environment=AUTOSSH_GATETIME=0
 # Environment=AUTOSSH_PORT=0
 WorkingDirectory=/home/lothar/lothar-face-bot
-ExecStart=/usr/bin/python3 =/home/lothar/lothar-face-bot/lothar-face-bot.py
+ExecStart=/usr/bin/python3 /home/lothar/lothar-face-bot/lothar-face-bot.py
 ExecStop=pkill -9 lothar-face-bot
 # don't use 'nobody' if your script needs to access user files
 # (if User is not set the service will run as root)
