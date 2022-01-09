@@ -96,9 +96,11 @@ def get_pic_of(update: Update, context: CallbackContext) -> None:
                 photo_folder = f"lothar-faces/{lothar}"
                 images_path = os.listdir(photo_folder)
                 random_index = np.round(random.random() * len(images_path)).astype(int)
-                filename = os.path.join(photo_folder, images_path[random_index])
+                chosen_image = images_path[random_index]
+                date_photo = chosen_image[10:12] + "-" + chosen_image[8:10] + "-" + chosen_image[4:8]
+                filename = os.path.join(photo_folder, )
                 update.message.reply_photo(open(filename, 'rb'))
-        #update.message.reply_text(f'photo of {lothar_mentioned}')
+                update.message.reply_text(f'foto di {lothar_mentioned} del date_photo')
     else:
         logger.info(f"not allowed in this chat ({update.message.chat.id}), sorry")
     #logger.debug(f"Chat {update.effective_chat.id} - Comando: {command}")
