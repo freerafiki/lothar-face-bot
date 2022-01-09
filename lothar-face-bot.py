@@ -98,7 +98,7 @@ def get_pic_of(update: Update, context: CallbackContext) -> None:
                 random_index = np.round(random.random() * len(images_path)).astype(int)
                 chosen_image = images_path[random_index]
                 date_photo = chosen_image[10:12] + "-" + chosen_image[8:10] + "-" + chosen_image[4:8]
-                filename = os.path.join(photo_folder, )
+                filename = os.path.join(photo_folder, chosen_image)
                 update.message.reply_photo(open(filename, 'rb'))
                 update.message.reply_text(f'foto di {lothar_mentioned} del date_photo')
     else:
