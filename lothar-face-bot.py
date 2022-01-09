@@ -127,9 +127,9 @@ def get_mosaic_of(update: Update, context: CallbackContext) -> None:
                         #date_photo = chosen_image[10:12] + "-" + chosen_image[8:10] + "-" + chosen_image[4:8]
                         filename = os.path.join(photo_folder, chosen_image)
                         small_img = plt.imread(filename)
-                        small_img_resized = cv2.resize(small_img, (720, 480, 3))
+                        small_img_resized = cv2.resize(small_img, (720, 480))
                         big_img[(480*i):(480*(i+1)), (720*j):(720*(j+1)), :] = small_img_resized
-                plt.imsave("tmp_mosaic.jpg", big_img)
+                plt.imsave("tmp_mosaic.jpg", big_img / 255)
                 update.message.reply_photo(open("tmp_mosaic.jpg", 'rb'))
                 update.message.reply_text(f'mosaico di {lothar_mentioned[0]}')
     else:
