@@ -198,6 +198,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("help", help_command))
     dispatcher.add_handler(CommandHandler("pic", get_pic_of))
     dispatcher.add_handler(CommandHandler("vector", get_embeddings_of))
+    dispatcher.add_handler(CommandHandler("mosaic", get_mosaic_of))
 
     # on non command i.e message - echo the message on Telegram
     #dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
