@@ -1,0 +1,24 @@
+[Unit]
+# By default 'simple' is used, see also https://www.freedesktop.org/software/systemd/man/systemd.service.html#Type=
+# Type=simple|forking|oneshot|dbus|notify|idle
+Description=Lothar Face Bot
+## make sure we only start the service after network is up
+Wants=systemd-networkd-wait-online.service
+After=systemd-networkd-wait-online.service
+
+[Service]
+## here we can set custom environment variables
+# Environment=AUTOSSH_GATETIME=0
+# Environment=AUTOSSH_PORT=0
+WorkingDirectory=/home/lothar/lothar-face-bot
+ExecStart=/usr/bin/python3 =/home/lothar/lothar-face-bot/lothar-face-bot.py
+ExecStop=pkill -9 lothar-face-bot
+# don't use 'nobody' if your script needs to access user files
+# (if User is not set the service will run as root)
+
+# Useful during debugging; remove it once the service is working
+StandardOutput=file:/home/lothar/lothar-face-bot/logs/daemon_output.log
+StandardError=file:/home/lothar/lothar-face-bot/logs/daemon_error.log
+
+[Install]
+WantedBy=multi-user.target
