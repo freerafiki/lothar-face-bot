@@ -6,6 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 import cv2
+import tensorflow as tf
+import tensorflow_hub as hub
 from dotenv import load_dotenv
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
@@ -38,6 +40,23 @@ lothar_names = ['ago', 'diciommo', 'facca', 'huba', 'lollo', 'moz', 'paggi',
        'palma', 'pecci', 'scotti', 'tonin']
 
 lothars_embeddings = {}
+
+global lothar_art_module
+
+lothar_art_styles = []
+
+
+def load_hub_module():
+    global lothar_art_module
+    lothar_art_module = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
+
+
+def load_art_styles():
+    art_styles_paths = os.listdir('styles')
+    for art_style in art_styles_paths:
+        if not art_style[0] == ".":
+            lothar_art_styles.append(art_style)
+    logger.info("art styles:", lothar_art_styles)
 
 
 def create_folders():
@@ -102,6 +121,43 @@ def get_pic_of(update: Update, context: CallbackContext) -> None:
                 filename = os.path.join(photo_folder, chosen_image)
                 update.message.reply_photo(open(filename, 'rb'))
                 update.message.reply_text(f'foto di {lothar_mentioned[0]} del {date_photo}')
+    else:
+        logger.info(f"not allowed in this chat ({update.message.chat.id}), sorry")
+    #logger.debug(f"Chat {update.effective_chat.id} - Comando: {command}")
+
+
+def make_art_from_pic_of(update: Update, context: CallbackContext) -> None:
+    """Return a photo of someone - needs to be a lothar"""
+    if check_correct_chat(update.message.chat.id):
+        full_command = ' '.join(context.args)
+        lothar_mentioned = get_lothar_mentioned(full_command)
+        if len(lothar_mentioned) == 0:
+            update.message.reply_text('Non ho trovato nessun lothar - di chi volevi la foto?')
+        else:
+            update.message.reply_text("mi metto all'opera, abbiate pazienza..")
+            for lothar in lothar_mentioned:
+                logger.info(f'Chat {update.effective_chat.id} - Photo of {lothar}')
+                photo_folder = f"lothar-faces/{lothar}"
+                images_path = os.listdir(photo_folder)
+                random_index = np.round(random.random() * len(images_path)).astype(int)
+                chosen_image = images_path[random_index]
+                date_photo = chosen_image[10:12] + "-" + chosen_image[8:10] + "-" + chosen_image[4:8]
+                filename = os.path.join(photo_folder, chosen_image)
+                logger.info(filename)
+                content_image = plt.imread(filename)
+                content_image = cv2.resize(content_image, (480, 640))
+                random_index = np.round(random.random() * len(lothar_art_styles)).astype(int)
+                # logger.info("random art index: ", random_index, "art styles:", len(art_styles_paths))
+                chosen_style = lothar_art_styles[random_index]
+                style_image = plt.imread(os.path.join("styles", chosen_style))
+                # Convert to float32 numpy array, add batch dimension, and normalize to range [0, 1]. Example using numpy:
+                content_image = content_image.astype(np.float32)[np.newaxis, ...] / 255.
+                style_image = style_image.astype(np.float32)[np.newaxis, ...] / 255.
+                outputs = lothar_art_module(tf.constant(content_image), tf.constant(style_image))
+                stylized_image = np.squeeze(outputs[0].numpy())
+                plt.imsave("tmp_art.jpg", stylized_image)
+                update.message.reply_photo(open("tmp_art.jpg", 'rb'))
+                update.message.reply_text(f'foto di {lothar_mentioned[0]} del {date_photo} rivisitata in stile {chosen_style[:-4]}')
     else:
         logger.info(f"not allowed in this chat ({update.message.chat.id}), sorry")
     #logger.debug(f"Chat {update.effective_chat.id} - Comando: {command}")
@@ -186,8 +242,14 @@ def classify_photo(update: Update, context: CallbackContext) -> None:
 
 def main() -> None:
 
+    logger.info("folders")
     create_folders()
+    logger.info("loading the embeddings")
     load_embeddings()
+    logger.info("loading the hub module")
+    load_hub_module()
+    logger.info("loading the art styles")
+    load_art_styles()
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
     updater = Updater(TOKEN)
@@ -201,6 +263,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("pic", get_pic_of))
     dispatcher.add_handler(CommandHandler("vector", get_embeddings_of))
     dispatcher.add_handler(CommandHandler("mosaic", get_mosaic_of))
+    dispatcher.add_handler(CommandHandler("art", make_art_from_pic_of))
 
     # on non command i.e message - echo the message on Telegram
     #dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
