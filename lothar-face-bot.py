@@ -56,7 +56,6 @@ def load_art_styles():
     for art_style in art_styles_paths:
         if not art_style[0] == ".":
             lothar_art_styles.append(art_style)
-            logger.info("loaded style: ", art_style)
 
 def create_folders():
     for lothar_key in lothars:
