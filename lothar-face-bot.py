@@ -113,7 +113,7 @@ def get_pic_of(update: Update, context: CallbackContext) -> None:
                 logger.info(f'Chat {update.effective_chat.id} - Photo of {lothar}')
                 photo_folder = f"lothar-faces/{lothar}"
                 images_path = os.listdir(photo_folder)
-                random_index = np.round(random.random() * len(images_path)).astype(int)
+                random_index = np.round(np.random.rand() * len(images_path)).astype(int)
                 chosen_image = images_path[random_index]
                 date_photo = chosen_image[10:12] + "-" + chosen_image[8:10] + "-" + chosen_image[4:8]
                 filename = os.path.join(photo_folder, chosen_image)
