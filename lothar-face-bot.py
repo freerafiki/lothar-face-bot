@@ -52,10 +52,12 @@ def load_hub_module():
 
 def load_art_styles():
     art_styles_paths = os.listdir('styles')
+    lothar_art_styles = []
     for art_style in art_styles_paths:
         if not art_style[0] == ".":
             lothar_art_styles.append(art_style)
-
+    for art_style in lothar_art_styles:
+        logger.info("style: ", art_style)
 
 def create_folders():
     for lothar_key in lothars:
