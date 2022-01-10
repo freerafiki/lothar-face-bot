@@ -29,15 +29,15 @@ lothars = {
     'huba':['huba', 'notaio'],
     'lollo':['lollo', 'brorenzo'],
     'moz':['moz'],
-    'palma':['palma'],
     'paggi':['paggi'],
+    'palma':['palma'],
     'pecci':['pippo', 'pecci'],
     'scotti':['scotti'],
     'tonin':['ale', 'tonin']
 }
 
-lothar_names = ['ago', 'diciommo', 'facca', 'huba', 'lollo', 'moz', 'paggi',
-       'palma', 'pecci', 'scotti', 'tonin']
+lothar_names = ['ago', 'diciommo', 'facca', 'huba', 'lollo', 'moz',
+        'paggi', 'palma', 'pecci', 'scotti', 'tonin']
 
 lothars_embeddings = {}
 
@@ -229,7 +229,7 @@ def classify_photo(update: Update, context: CallbackContext) -> None:
                 lothar_found = lothar_names[np.argmax(results)]
                 logger.info(results)
                 logger.info(lothar_names)
-                logger.info([lll for lll in lothars_embeddings])
+                #logger.info([lll for lll in lothars_embeddings])
                 update.message.reply_text(f"trovato {lothar_found} nella foto!")
             else:
                 update.message.reply_text("trovato una faccia, ma non lothar")
