@@ -42,7 +42,7 @@ lothars_embeddings = {}
 
 global lothar_art_module
 
-lothar_art_styles = []
+global lothar_art_styles
 
 
 def load_hub_module():
@@ -51,6 +51,7 @@ def load_hub_module():
 
 
 def load_art_styles():
+    global lothar_art_styles
     art_styles_paths = os.listdir('styles')
     lothar_art_styles = []
     for art_style in art_styles_paths:
@@ -144,12 +145,11 @@ def make_art_from_pic_of(update: Update, context: CallbackContext) -> None:
                 filename = os.path.join(photo_folder, chosen_image)
                 content_image = plt.imread(filename)
                 content_image = cv2.resize(content_image, (480, 640))
-                random_index = np.round(np.random.rand() * len(lothar_art_styles)).astype(int)
+                random_art_index = np.round(np.random.rand() * len(lothar_art_styles)).astype(int)
                 # logger.info("random art index: ", random_index, "art styles:", len(art_styles_paths))
-                chosen_style = lothar_art_styles[random_index]
+                chosen_style = lothar_art_styles[random_art_index]
                 style_image = plt.imread(os.path.join("styles", chosen_style))
-                logger.info("chosen style index:", chosen_style)
-                logger.info("style image:", style_image[0])
+                logger.info(f"style image: {chosen_style} - index {random_art_index}")
                 # Convert to float32 numpy array, add batch dimension, and normalize to range [0, 1]. Example using numpy:
                 content_image = content_image.astype(np.float32)[np.newaxis, ...] / 255.
                 style_image = style_image.astype(np.float32)[np.newaxis, ...] / 255.
@@ -250,6 +250,8 @@ def main() -> None:
     load_hub_module()
     logger.info("loading the art styles")
     load_art_styles()
+    logger.info(f"loaded {len(lothar_art_styles)} styles:")
+
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
     updater = Updater(TOKEN)
