@@ -56,8 +56,7 @@ def load_art_styles():
     for art_style in art_styles_paths:
         if not art_style[0] == ".":
             lothar_art_styles.append(art_style)
-    for art_style in lothar_art_styles:
-        logger.info("style: ", art_style)
+            logger.info("loaded style: ", art_style)
 
 def create_folders():
     for lothar_key in lothars:
@@ -151,7 +150,7 @@ def make_art_from_pic_of(update: Update, context: CallbackContext) -> None:
                 chosen_style = lothar_art_styles[random_index]
                 style_image = plt.imread(os.path.join("styles", chosen_style))
                 logger.info("chosen style index:", chosen_style)
-                logger.info("style image:", style_image)
+                logger.info("style image:", style_image[0])
                 # Convert to float32 numpy array, add batch dimension, and normalize to range [0, 1]. Example using numpy:
                 content_image = content_image.astype(np.float32)[np.newaxis, ...] / 255.
                 style_image = style_image.astype(np.float32)[np.newaxis, ...] / 255.
