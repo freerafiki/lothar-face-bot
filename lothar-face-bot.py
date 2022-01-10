@@ -134,6 +134,7 @@ def make_art_from_pic_of(update: Update, context: CallbackContext) -> None:
         if len(lothar_mentioned) == 0:
             update.message.reply_text('Non ho trovato nessun lothar - di chi volevi la foto?')
         else:
+            logger.info("making art")
             update.message.reply_text("mi metto all'opera, abbiate pazienza..")
             for lothar in lothar_mentioned:
                 logger.info(f'Chat {update.effective_chat.id} - Photo of {lothar}')
@@ -143,13 +144,14 @@ def make_art_from_pic_of(update: Update, context: CallbackContext) -> None:
                 chosen_image = images_path[random_index]
                 date_photo = chosen_image[10:12] + "-" + chosen_image[8:10] + "-" + chosen_image[4:8]
                 filename = os.path.join(photo_folder, chosen_image)
-                logger.info(filename)
                 content_image = plt.imread(filename)
                 content_image = cv2.resize(content_image, (480, 640))
                 random_index = np.round(np.random.rand() * len(lothar_art_styles)).astype(int)
                 # logger.info("random art index: ", random_index, "art styles:", len(art_styles_paths))
                 chosen_style = lothar_art_styles[random_index]
                 style_image = plt.imread(os.path.join("styles", chosen_style))
+                logger.info("chosen style index:", chosen_style)
+                logger.info("style image:", style_image)
                 # Convert to float32 numpy array, add batch dimension, and normalize to range [0, 1]. Example using numpy:
                 content_image = content_image.astype(np.float32)[np.newaxis, ...] / 255.
                 style_image = style_image.astype(np.float32)[np.newaxis, ...] / 255.
