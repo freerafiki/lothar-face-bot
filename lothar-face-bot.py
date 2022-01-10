@@ -146,10 +146,13 @@ def make_art_from_pic_of(update: Update, context: CallbackContext) -> None:
                 content_image = plt.imread(filename)
                 content_image = cv2.resize(content_image, (480, 640))
                 random_art_index = np.round(np.random.rand() * len(lothar_art_styles)).astype(int)
+                logger.info(f"random art index: {random_art_index}")
                 # logger.info("random art index: ", random_index, "art styles:", len(art_styles_paths))
+                if random_art_index >= len(lothar_art_styles):
+                    random_art_index = len(lothar_art_styles-1)
                 chosen_style = lothar_art_styles[random_art_index]
                 style_image = plt.imread(os.path.join("styles", chosen_style))
-                logger.info(f"style image: {chosen_style} - index {random_art_index}")
+                logger.info(f"style image: {chosen_style}")
                 # Convert to float32 numpy array, add batch dimension, and normalize to range [0, 1]. Example using numpy:
                 content_image = content_image.astype(np.float32)[np.newaxis, ...] / 255.
                 style_image = style_image.astype(np.float32)[np.newaxis, ...] / 255.
