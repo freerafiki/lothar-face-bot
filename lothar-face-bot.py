@@ -232,9 +232,15 @@ def classify_photo(update: Update, context: CallbackContext) -> None:
             face_embedding = recognized_face[0]
             results = face_recognition.compare_faces([l_emb for l_emb in lothars_embeddings.values()], face_embedding)
             if np.max(results):
-                lothar_found = lothar_names[np.argmax(results)]
+                index_first_lothar = np.argmax(results)
+                lothar_found = lothar_names[index_first_lothar]
                 logger.info(results)
                 logger.info(lothar_names)
+                if np.sum(results) > 1:
+                    results[index_first_lothar] = False
+                    for j in range(len(results)):
+                        if results[j] is True:
+                            lothar_found += " e " + lothar_names[j]
                 #logger.info([lll for lll in lothars_embeddings])
                 update.message.reply_text(f"trovato {lothar_found} nella foto!")
             else:
