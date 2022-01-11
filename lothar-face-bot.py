@@ -81,7 +81,9 @@ def get_lothar_mentioned(text):
 
 def check_correct_chat(id):
     id = str(id)
-    if id == os.getenv("chatlotharid") or id == os.getenv("chatpalmaid"):
+    if id == os.getenv("chatlotharid") or \
+            id == os.getenv("chatpalmaid") or \
+            id == os.getenv("chatlolloid"):
         return True
     return False
 
