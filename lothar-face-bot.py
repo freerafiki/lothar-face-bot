@@ -120,12 +120,12 @@ def get_pic_of(update: Update, context: CallbackContext) -> None:
                 chosen_image = images_path[random_index]
                 date_photo = chosen_image[10:12] + "-" + chosen_image[8:10] + "-" + chosen_image[4:8]
                 filename = os.path.join(photo_folder, chosen_image)
-                update.message.reply_photo(open(filename, 'rb'))
-                update.message.reply_text(f'foto di {lothar_mentioned[0]} del {date_photo}')
+                update.message.reply_photo(open(filename, 'rb'), caption=f'foto di {lothar_mentioned[0]} del {date_photo}')
+                #update.message.reply_text()
     else:
         logger.info(f"not allowed in this chat ({update.message.chat.id}), sorry")
-    #logger.debug(f"Chat {update.effective_chat.id} - Comando: {command}")
-
+        #logger.debug(f"Chat {update.effective_chat.id} - Comando: {command}")
+        update.message.reply_text(f"not allowed in this chat ({update.message.chat.id}), sorry")
 
 def make_art_from_pic_of(update: Update, context: CallbackContext) -> None:
     """Return a photo of someone - needs to be a lothar"""
@@ -161,12 +161,12 @@ def make_art_from_pic_of(update: Update, context: CallbackContext) -> None:
                 outputs = lothar_art_module(tf.constant(content_image), tf.constant(style_image))
                 stylized_image = np.squeeze(outputs[0].numpy())
                 plt.imsave("tmp_art.jpg", stylized_image)
-                update.message.reply_photo(open("tmp_art.jpg", 'rb'))
-                update.message.reply_text(f'foto di {lothar_mentioned[0]} del {date_photo} rivisitata in stile {chosen_style[:-4]}')
+                update.message.reply_photo(open("tmp_art.jpg", 'rb'), caption=f'foto di {lothar_mentioned[0]} del {date_photo} rivisitata in stile {chosen_style[:-4]}')
+                #update.message.reply_text()
     else:
         logger.info(f"not allowed in this chat ({update.message.chat.id}), sorry")
-    #logger.debug(f"Chat {update.effective_chat.id} - Comando: {command}")
-
+        #logger.debug(f"Chat {update.effective_chat.id} - Comando: {command}")
+        update.message.reply_text(f"not allowed in this chat ({update.message.chat.id}), sorry")
 
 def get_mosaic_of(update: Update, context: CallbackContext) -> None:
     """Return the encoding of someone as small image - needs to be a lothar"""
@@ -197,7 +197,7 @@ def get_mosaic_of(update: Update, context: CallbackContext) -> None:
                 #update.message.reply_text(f'mosaico di {lothar_mentioned[0]}')
     else:
         logger.info(f"not allowed in this chat ({update.message.chat.id}), sorry")
-
+        update.message.reply_text(f"not allowed in this chat ({update.message.chat.id}), sorry")
 
 def get_embeddings_of(update: Update, context: CallbackContext) -> None:
     """Return the encoding of someone as small image - needs to be a lothar"""
@@ -214,7 +214,7 @@ def get_embeddings_of(update: Update, context: CallbackContext) -> None:
                 update.message.reply_photo(open(filename, 'rb'))
     else:
         logger.info(f"not allowed in this chat ({update.message.chat.id}), sorry")
-
+        update.message.reply_text(f"not allowed in this chat ({update.message.chat.id}), sorry")
 
 def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
@@ -229,27 +229,33 @@ def classify_photo(update: Update, context: CallbackContext) -> None:
         tmp_image = face_recognition.load_image_file("tmp.jpg")
         recognized_face = face_recognition.face_encodings(tmp_image)
         if recognized_face:
-            face_embedding = recognized_face[0]
-            results = face_recognition.compare_faces([l_emb for l_emb in lothars_embeddings.values()], face_embedding)
-            if np.max(results):
-                index_first_lothar = np.argmax(results)
-                lothar_found = lothar_names[index_first_lothar]
-                logger.info(results)
-                logger.info(lothar_names)
-                if np.sum(results) > 1:
-                    results[index_first_lothar] = False
-                    for j in range(len(results)):
-                        if results[j] is True:
-                            lothar_found += " e " + lothar_names[j]
-                #logger.info([lll for lll in lothars_embeddings])
-                update.message.reply_text(f"trovato {lothar_found} nella foto!")
+            lothars_found = []
+            for face_embedding in recognized_face:
+                #face_embedding = recognized_face[0]
+                results = face_recognition.compare_faces([l_emb for l_emb in lothars_embeddings.values()], face_embedding)
+                if np.max(results):
+                    index_first_lothar = np.argmax(results)
+                    lothar_found = lothar_names[index_first_lothar]
+                    lothars_found.append(lothar_found)
+                    #logger.info([lll for lll in lothars_embeddings])
+            if len(lothars_found) > 0:
+                if len(lothars_found) == 1:
+                    update.message.reply_text(f"trovato {lothars_found[0]} nella foto!")
+                else:
+                    lothars_f = ""
+                    for i in range(len(lothars_found)):
+                        if i == 0:
+                            lothars_f += lothars_found[0]
+                        else:
+                            lothars_f += " e " + lothars_found[i]
+                    update.message.reply_text(f"trovati {lothars_f} nella foto!")
             else:
                 update.message.reply_text("trovato una faccia, ma non lothar")
         else:
             update.message.reply_text("non sembrano esserci facce, o sono un bot ancora troppo stupido")
     else:
         logger.info(f"not allowed in this chat ({update.message.chat.id}), sorry")
-
+        update.message.reply_text(f"not allowed in this chat ({update.message.chat.id}), sorry")
 
 def main() -> None:
 
