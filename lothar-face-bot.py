@@ -44,6 +44,7 @@ global lothar_art_module
 
 global lothar_art_styles
 
+global art_style
 
 def load_hub_module():
     global lothar_art_module
@@ -51,12 +52,13 @@ def load_hub_module():
 
 
 def load_art_styles():
-    global lothar_art_styles
+    global lothar_art_styles, art_style
     art_styles_paths = os.listdir('styles')
     lothar_art_styles = []
     for art_style in art_styles_paths:
         if not art_style[0] == ".":
             lothar_art_styles.append(art_style)
+    art_style = np.round(np.random.rand() * len(lothar_art_styles))
 
 def create_folders():
     for lothar_key in lothars:
@@ -129,6 +131,7 @@ def get_pic_of(update: Update, context: CallbackContext) -> None:
 
 def make_art_from_pic_of(update: Update, context: CallbackContext) -> None:
     """Return a photo of someone - needs to be a lothar"""
+    global art_style
     if check_correct_chat(update.message.chat.id):
         full_command = ' '.join(context.args)
         lothar_mentioned = get_lothar_mentioned(full_command)
@@ -147,11 +150,13 @@ def make_art_from_pic_of(update: Update, context: CallbackContext) -> None:
                 filename = os.path.join(photo_folder, chosen_image)
                 content_image = plt.imread(filename)
                 content_image = cv2.resize(content_image, (480, 640))
-                random_art_index = np.round(np.random.rand() * len(lothar_art_styles)).astype(int)
+                random_art_index = np.floor(art_style + np.random.rand() * 5 % len(lothar_art_styles)).astype(int)
                 logger.info(f"random art index: {random_art_index}")
+                #random_art_index = np.round(np.random.rand() * len(lothar_art_styles)).astype(int)
+                art_style = (art_style + 2) % len(lothar_art_styles)
                 # logger.info("random art index: ", random_index, "art styles:", len(art_styles_paths))
                 if random_art_index >= len(lothar_art_styles):
-                    random_art_index = len(lothar_art_styles-1)
+                    random_art_index = len(lothar_art_styles)-1
                 chosen_style = lothar_art_styles[random_art_index]
                 style_image = plt.imread(os.path.join("styles", chosen_style))
                 logger.info(f"style image: {chosen_style}")
