@@ -257,7 +257,7 @@ def classify_photo(update: Update, context: CallbackContext) -> None:
             else:
                 update.message.reply_text("trovato una faccia, ma non lothar")
         else:
-            update.message.reply_text("non sembrano esserci facce, o sono un bot ancora troppo stupido")
+            update.message.reply_text("non sembrano esserci facce, o non avete ancora inviato le foto a Facca.")
     else:
         logger.info(f"not allowed in this chat ({update.message.chat.id}), sorry")
         update.message.reply_text(f"not allowed in this chat ({update.message.chat.id}), sorry")
