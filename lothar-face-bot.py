@@ -245,7 +245,10 @@ def classify_photo(update: Update, context: CallbackContext) -> None:
                     #logger.info([lll for lll in lothars_embeddings])
             if len(lothars_found) > 0:
                 if len(lothars_found) == 1:
-                    update.message.reply_text(f"trovato {lothars_found[0]} nella foto!")
+                    if (lothars_found[0]=='lollo'):
+                        update.message.reply_text(f"trovato Manu Ginobili de Bahía Blanca nella foto!")
+                    else:    
+                        update.message.reply_text(f"trovato {lothars_found[0]} nella foto!")
                 else:
                     lothars_f = ""
                     for i in range(len(lothars_found)):
